@@ -94,7 +94,7 @@ export default function SignInPage() {
         )}
       </Button>
 
-      {/* ডিভাইডার */}
+      {/* ডিভাইডার  */}
       <div className="relative mb-6">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-slate-700"></div>
