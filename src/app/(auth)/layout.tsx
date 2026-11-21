@@ -37,7 +37,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             transition={{ delay: 0.7, duration: 0.8 }}
             className="text-slate-300 text-lg max-w-md"
           >
-            Join thousands of couples and vendors creating magical weddings together on VowVista.
+            Join thousands of couples and vendors creating magical weddings together on WedPlan.
           </motion.p>
         </div>
       </div>
@@ -47,7 +47,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         {/* মোবাইলের জন্য লোগো */}
         <div className="absolute top-8 left-8 lg:hidden">
           <Link href="/" className="text-2xl font-heading font-bold text-[#d4af37]">
-            VowVista
+            WedPlan
           </Link>
         </div>
         

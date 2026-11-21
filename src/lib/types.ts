@@ -1,8 +1,22 @@
 export type ServiceStatus = "pending" | "approved" | "rejected";
+export type BookingStatus = "pending" | "accepted" | "rejected" | "cancelled";
+
+export interface VendorSummary {
+  _id?: string;
+  name?: string;
+  email?: string;
+  businessName?: string;
+  image?: string;
+}
 
 export interface Service {
   _id: string;
   vendorId: string;
+  vendor?: VendorSummary;
+  vendorName?: string;
+  vendorEmail?: string;
+  vendorBusinessName?: string;
+  vendorImage?: string;
   serviceName: string;
   category: string;
   description: string;

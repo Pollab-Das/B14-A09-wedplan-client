@@ -6,33 +6,33 @@ import Link from "next/link";
 export function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-      {/* 🌟 স্মুথ ডাইনামিক ব্যাকগ্রাউন্ড */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0f172a] via-[#0f172a]/95 to-[#0f172a] z-10" />
-        
-        {/* মাখনের মতো স্মুথ ব্রিদিং গ্লো (স্ক্রল ল্যাগ নেই) */}
-        <motion.div 
-          animate={{ 
-            scale: [1, 1.2, 1],
-            opacity: [0.15, 0.25, 0.15]
-          }}
-          transition={{ 
-            duration: 8, 
-            repeat: Infinity, 
-            ease: "easeInOut" 
-          }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#d4af37] rounded-full blur-[200px] z-0" 
+      <div className="absolute inset-0 z-0" aria-hidden="true">
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40"
+          style={{ backgroundImage: "url('/wedding-hero.svg')" }}
         />
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.15, 0.25, 0.15],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#d4af37] rounded-full blur-[200px] z-0"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0f172a]/70 via-[#0f172a]/85 to-[#0f172a] z-10" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 text-center">
-        {/* কন্টেন্ট আগের মতোই থাকবে */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          <span className="inline-block py-1 px-3 rounded-full border border-[#d4af37]/30 bg-[#d4af37]/10 text-[#d4af37] text-sm font-semibold tracking-wider mb-6">
+          <span className="inline-block py-1 px-3 rounded-full border border-[#d4af37]/30 bg-[#0f172a]/60 text-[#d4af37] text-sm font-semibold tracking-wider mb-6">
             Your Perfect Wedding Starts Here
           </span>
         </motion.div>
@@ -56,7 +56,7 @@ export function HeroSection() {
           className="text-slate-muted text-lg md:text-xl max-w-2xl mx-auto mb-10"
         >
           Discover top-rated venues, photographers, caterers, and more. Plan your perfect day with
-          ease on VowVista.
+          ease on WedPlan.
         </motion.p>
 
         <motion.div

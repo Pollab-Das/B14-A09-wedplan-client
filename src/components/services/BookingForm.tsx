@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth-client";
+import { Booking } from "@/lib/types";
 
 export function BookingForm({ service }: { service: any }) {
   const router = useRouter();
@@ -44,6 +45,21 @@ export function BookingForm({ service }: { service: any }) {
 
     setLoading(true);
     try {
+      const existing = await fetchWithAuth("/bookings/customer");
+      const bookings: Booking[] = Array.isArray(existing) ? existing : [];
+      const requestedDate = formData.eventDate.slice(0, 10);
+      const hasDuplicate = bookings.some(
+        (booking) =>
+          booking.serviceId === service._id &&
+          String(booking.eventDate).slice(0, 10) === requestedDate &&
+          (booking.status === "pending" || booking.status === "accepted")
+      );
+
+      if (hasDuplicate) {
+        toast.error("You already have an active booking for this service on that date.");
+        return;
+      }
+
       await fetchWithAuth("/bookings", {
         method: "POST",
         body: JSON.stringify({
@@ -55,7 +71,12 @@ export function BookingForm({ service }: { service: any }) {
       toast.success("Booking request submitted successfully!");
       router.push("/dashboard/customer/bookings");
     } catch (error: any) {
-      toast.error(error.message);
+      const message = error?.message || "";
+      if (/already|duplicate|exist/i.test(message)) {
+        toast.error("You already have an active booking for this service on that date.");
+      } else {
+        toast.error(message || "Unable to submit booking request. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

@@ -40,7 +40,7 @@ export default function HowItWorksPage() {
               animate={{ opacity: 1, y: 0 }}
               className="font-heading text-5xl md:text-6xl font-bold text-[#FDFBF7] mb-6"
             >
-              How <span className="text-[#d4af37]">VowVista</span> Works
+              How <span className="text-[#d4af37]">WedPlan</span> Works
             </motion.h1>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -94,7 +94,7 @@ export default function HowItWorksPage() {
                 Ready to start planning?
               </h2>
               <p className="text-slate-400 mb-8 max-w-xl mx-auto">
-                Join thousands of happy couples who found their perfect vendors on VowVista.
+                Join thousands of happy couples who found their perfect vendors on WedPlan.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link href="/browse-services">

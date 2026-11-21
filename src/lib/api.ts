@@ -1,27 +1,34 @@
 import { authClient } from "./auth-client";
+import { Service } from "./types";
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-// পাবলিক সার্ভিস (আগেরটা)
 export async function getPublicServices(query = "") {
   try {
-    const res = await fetch(`${API_URL}/services${query ? `?${query}` : ""}`, {
+    const params = new URLSearchParams(query.replace(/^[?&]+/, ""));
+    params.set("status", "approved");
+    params.set("isActive", "true");
+
+    const res = await fetch(`${API_URL}/services?${params.toString()}`, {
       next: { revalidate: 60 }, 
     });
     if (!res.ok) return [];
-    return res.json();
-  } catch (error) {
-    console.error("API Error:", error);
+    const data = await res.json();
+    if (!Array.isArray(data)) return data;
+    return data.filter((service: Service) =>
+      (service.status === undefined || service.status === "approved") &&
+      (service.isActive === undefined || String(service.isActive) === "true")
+    );
+  } catch {
     return [];
   }
 }
 
-// টোকেন সহ প্রোটেক্টেড রিকোয়েস্ট
 export async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
   const { data: session } = await authClient.getSession();
   
   if (!session?.session?.token) {
-    throw new Error("Unauthorized");
+    throw new Error("Unauthorized: Please sign in again");
   }
 
   const res = await fetch(`${API_URL}${endpoint}`, {

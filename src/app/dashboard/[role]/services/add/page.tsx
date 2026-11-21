@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { fetchWithAuth } from "@/lib/api";
 import { uploadImageToImgBB } from "@/lib/upload";
+import { useSession } from "@/lib/auth-client";
+import { Service } from "@/lib/types";
 import { toast } from "sonner";
 import { Upload, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,6 +24,7 @@ const CATEGORIES = [
 
 export default function AddServicePage() {
   const router = useRouter();
+  const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState<string[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -62,9 +65,22 @@ export default function AddServicePage() {
     setLoading(true);
 
     try {
+      if (session?.user?.subscriptionPlan !== "premium") {
+        const existing = await fetchWithAuth("/services/vendor");
+        const activeCount = Array.isArray(existing)
+          ? (existing as Service[]).filter((service) => service.isActive).length
+          : 0;
+
+        if (activeCount >= 3) {
+          toast.error("Free plan allows up to 3 active services. Upgrade to Premium to add more.");
+          router.push("/dashboard/vendor/subscription");
+          return;
+        }
+      }
+
       await fetchWithAuth("/services", {
         method: "POST",
-        body: JSON.stringify({ ...formData, price: Number(formData.price), images }),
+        body: JSON.stringify({ ...formData, price: Number(formData.price), images, status: "pending" }),
       });
 
       toast.success("Service added successfully! Awaiting admin approval.");
@@ -121,6 +137,7 @@ export default function AddServicePage() {
         {/* ইমেজ আপলোড */}
         <div className="space-y-4">
           <Label className="text-slate-300">Service Images</Label>
+          <p className="text-xs text-slate-500">JPG, PNG, WEBP or GIF only, up to 5MB each.</p>
           
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {images.map((url, idx) => (
@@ -140,7 +157,7 @@ export default function AddServicePage() {
                   <span className="text-xs text-slate-400">Upload</span>
                 </>
               )}
-              <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploadingImage} />
+              <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" onChange={handleImageUpload} disabled={uploadingImage} />
             </label>
           </div>
         </div>

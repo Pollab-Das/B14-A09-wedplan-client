@@ -6,6 +6,11 @@ export async function getSession() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
+
+  if (session?.user?.isBlocked) {
+    redirect("/sign-in?error=blocked");
+  }
+
   return session;
 }
 

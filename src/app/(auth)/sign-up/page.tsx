@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
@@ -12,12 +12,19 @@ import { toast } from "sonner";
 import { Upload, User, Mail, Lock, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function SignUpPage() {
+export default function SignUpPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ role?: string }>;
+}) {
   const router = useRouter();
+  const { role: roleParam } = use(searchParams);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [role, setRole] = useState<"customer" | "vendor">("customer");
+  const [role, setRole] = useState<"customer" | "vendor">(
+    roleParam === "vendor" ? "vendor" : "customer"
+  );
   
   const [formData, setFormData] = useState({
     name: "",
@@ -36,6 +43,16 @@ export default function SignUpPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (
+      formData.password.length < 6 ||
+      !/[A-Z]/.test(formData.password) ||
+      !/[a-z]/.test(formData.password)
+    ) {
+      toast.error("Password must be at least 6 characters with one uppercase and one lowercase letter.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -53,15 +70,14 @@ export default function SignUpPage() {
       });
 
       if (error) {
-        // Better Auth-এর আসল এরর মেসেজ দেখান
         toast.error(error.message || "Failed to create account");
         return;
       }
 
-      toast.success("Account created successfully! Please sign in.");
-      router.push("/sign-in");
-    } catch (err: any) {
-      toast.error(err.message || "Something went wrong");
+      toast.success("Account created successfully!");
+      router.push(role === "vendor" ? "/dashboard/vendor" : "/dashboard/customer");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -72,10 +88,10 @@ export default function SignUpPage() {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/dashboard/customer", // Google লগইনের পর ডিফল্ট রিডাইরেক্ট
+        callbackURL: "/auth/callback",
       });
-    } catch (err: any) {
-      toast.error(err.message || "Google sign up failed");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Google sign up failed");
       setGoogleLoading(false);
     }
   };
@@ -89,7 +105,7 @@ export default function SignUpPage() {
     >
       <div className="mb-8 text-center lg:text-left">
         <h1 className="font-heading text-4xl font-bold text-[#FDFBF7] mb-2">Create an Account</h1>
-        <p className="text-slate-400">Join VowVista to start planning your dream wedding.</p>
+        <p className="text-slate-400">Join WedPlan to start planning your dream wedding.</p>
       </div>
 
       {/* Google Sign Up বাটন */}
@@ -137,7 +153,7 @@ export default function SignUpPage() {
             }`}
           >
             <span className="block font-bold">Customer</span>
-            <span className="text-xs opacity-80">I'm planning a wedding</span>
+            <span className="text-xs opacity-80">I&apos;m planning a wedding</span>
           </button>
           <button
             type="button"
@@ -212,6 +228,8 @@ export default function SignUpPage() {
               type="password"
               placeholder="Min 6 chars, 1 uppercase, 1 lowercase"
               required
+              minLength={6}
+              title="At least 6 characters with one uppercase and one lowercase letter"
               className="pl-10 bg-[#1e293b] border-slate-700 text-[#FDFBF7] focus-visible:ring-[#d4af37]"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}

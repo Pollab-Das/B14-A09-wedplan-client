@@ -5,7 +5,7 @@ import { MongoClient } from "mongodb";
 const baseURL = process.env.BETTER_AUTH_URL || "http://localhost:3000";
 
 const client = new MongoClient(process.env.MONGODB_URI as string);
-const db = client.db(process.env.MONGODB_DB_NAME || "vowvista");
+const db = client.db(process.env.MONGODB_DB_NAME || "wedplan");
 
 export const auth = betterAuth({
   baseURL,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
@@ -11,11 +11,24 @@ import { toast } from "sonner";
 import { Mail, Lock, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function SignInPage() {
+export default function SignInPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
   const router = useRouter();
+  const { error: authError } = use(searchParams);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "" });
+
+  useEffect(() => {
+    if (authError === "blocked") {
+      toast.error("Your account has been blocked. Please contact support.");
+    } else if (authError) {
+      toast.error("We couldn't complete your sign in. Please try again.");
+    }
+  }, [authError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,16 +45,16 @@ export default function SignInPage() {
         return;
       }
 
-      toast.success("Welcome back!");
-      
-      // রোল অনুযায়ী রিডাইরেক্ট
-      const role = data?.user?.role;
-      if (role === "admin") router.push("/dashboard/admin");
-      else if (role === "vendor") router.push("/dashboard/vendor");
-      else router.push("/dashboard/customer");
+      if (data?.user?.isBlocked) {
+        await authClient.signOut();
+        toast.error("Your account has been blocked. Please contact support.");
+        return;
+      }
 
-    } catch (err: any) {
-      toast.error("Something went wrong");
+      toast.success("Welcome back!");
+      router.push("/auth/callback");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -52,10 +65,10 @@ export default function SignInPage() {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/dashboard/customer", // রোল অনুযায়ী ড্যাশবোর্ডে রিডাইরেক্ট হবে
+        callbackURL: "/auth/callback",
       });
-    } catch (err: any) {
-      toast.error(err.message || "Google sign in failed");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Google sign in failed");
       setGoogleLoading(false);
     }
   };
@@ -148,7 +161,7 @@ export default function SignInPage() {
       </form>
 
       <p className="mt-8 text-center text-slate-400">
-        Don't have an account?{" "}
+        Don&apos;t have an account?{" "}
         <Link href="/sign-up" className="text-[#d4af37] hover:underline font-semibold">
           Sign Up
         </Link>
