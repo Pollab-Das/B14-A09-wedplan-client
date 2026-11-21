@@ -33,7 +33,7 @@ export default function RootLayout({
       >
         {children}
         
-        {/* 🌟 নোটিফিকেশনের জন্য Toaster */}
+        {/* 🌟 Toaster */}
         <Toaster 
           position="top-right" 
           richColors 
