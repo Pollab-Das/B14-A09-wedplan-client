@@ -5,9 +5,10 @@ import { fetchWithAuth } from "@/lib/api";
 import { useSession } from "@/lib/auth-client";
 import { Users, Store, Calendar, DollarSign, Clock, ShieldCheck, Loader2, Heart, CheckCircle, XCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 export default function DashboardPage({ params }: { params: Promise<{ role: string }> }) {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const [role, setRole] = useState("");
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>({});
@@ -15,7 +16,7 @@ export default function DashboardPage({ params }: { params: Promise<{ role: stri
   useEffect(() => { params.then(p => setRole(p.role)); }, [params]);
 
   useEffect(() => {
-    if (!role) return;
+    if (!role || isPending || !session) return;
     const fetchStats = async () => {
       try {
         if (role === "admin") {
@@ -42,11 +43,13 @@ export default function DashboardPage({ params }: { params: Promise<{ role: stri
             rejectedBookings: bookings.filter((b: any) => b.status === "rejected").length
           });
         }
-      } catch (e) { console.error(e); } 
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Failed to load dashboard data");
+      }
       finally { setLoading(false); }
     };
     fetchStats();
-  }, [role, session]);
+  }, [role, session, isPending]);
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="w-10 h-10 animate-spin text-[#d4af37]" /></div>;
 

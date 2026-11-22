@@ -2,14 +2,15 @@ import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { MongoClient } from "mongodb";
 
-const baseURL = process.env.BETTER_AUTH_URL || "http://localhost:3000";
+const baseURL = process.env.BETTER_AUTH_URL || "https://b14-a09-wedplan-client.vercel.app";
 
 const client = new MongoClient(process.env.MONGODB_URI as string);
 const db = client.db(process.env.MONGODB_DB_NAME || "wedplan");
 
 export const auth = betterAuth({
   baseURL,
-  trustedOrigins: [baseURL, "http://localhost:3000", "http://127.0.0.1:3000"],
+  trustedOrigins: [baseURL, "http://localhost:3000", "http://127.0.0.1:3000" , 
+    "https://b14-a09-wedplan-client.vercel.app" ],
   database: mongodbAdapter(db, { client }),
   onAPIError: {
     errorURL: "/auth-error",

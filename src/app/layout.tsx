@@ -24,17 +24,16 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){var n=document.querySelectorAll("#scrnli_recorder_root");for(var i=0;i<n.length;i++){var e=n[i],p=e.parentNode;if(!p)continue;if(e.hasAttribute("data-app-root")){e.removeAttribute("id");continue;}while(e.firstChild)p.insertBefore(e.firstChild,e);p.removeChild(e);}})()`,
-          }}
-        />
-      </head>
       <body 
         className={`${cormorant.variable} ${lato.variable} font-sans antialiased`}
         suppressHydrationWarning
       >
+        <script
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var n=document.querySelectorAll("#scrnli_recorder_root");for(var i=0;i<n.length;i++){var e=n[i],p=e.parentNode;if(!p)continue;if(e.hasAttribute("data-app-root")){e.removeAttribute("id");continue;}while(e.firstChild)p.insertBefore(e.firstChild,e);p.removeChild(e);}})()`,
+          }}
+        />
         <div data-app-root suppressHydrationWarning>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
             {children}
