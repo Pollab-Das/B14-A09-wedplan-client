@@ -22,10 +22,14 @@ export default function SubscriptionPage() {
       });
       
       // Stripe Checkout পেজে রিডাইরেক্ট
-      if (url) window.location.href = url;
-      
-    } catch (error: any) {
-      toast.error(error.message);
+      if (url) {
+        window.location.href = url;
+        return;
+      }
+
+      throw new Error("Checkout URL was not returned. Please try again.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Payment could not be started");
       setLoading(false);
     }
   };

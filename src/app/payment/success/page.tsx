@@ -6,7 +6,6 @@ import { useSearchParams } from "next/navigation";
 import { AlertCircle, CheckCircle, Clock3, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { authClient } from "@/lib/auth-client";
 
 type VerificationState = "verifying" | "premium" | "pending" | "unverified";
 
@@ -30,8 +29,8 @@ function PaymentSuccessContent() {
   useEffect(() => {
     let cancelled = false;
 
-    const verify = async () => {
-      setState("verifying");
+    const verify = async (showLoading: boolean) => {
+      if (showLoading) setState("verifying");
 
       if (!sessionId) {
         setState("unverified");
@@ -39,7 +38,11 @@ function PaymentSuccessContent() {
       }
 
       try {
-        const { data } = await authClient.getSession();
+        const response = await fetch("/api/auth/get-session?disableCookieCache=true", {
+          credentials: "include",
+          cache: "no-store",
+        });
+        const data = response.ok ? await response.json() : null;
         if (cancelled) return;
         setState(data?.user?.subscriptionPlan === "premium" ? "premium" : "pending");
       } catch {
@@ -47,8 +50,23 @@ function PaymentSuccessContent() {
       }
     };
 
-    verify();
-    return () => { cancelled = true; };
+    verify(attempt === 0);
+
+    let interval: ReturnType<typeof setInterval> | undefined;
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+
+    if (sessionId) {
+      interval = setInterval(() => verify(false), 4000);
+      timeout = setTimeout(() => {
+        if (interval) clearInterval(interval);
+      }, 30000);
+    }
+
+    return () => {
+      cancelled = true;
+      if (interval) clearInterval(interval);
+      if (timeout) clearTimeout(timeout);
+    };
   }, [sessionId, attempt]);
 
   const display = {

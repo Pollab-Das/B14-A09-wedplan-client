@@ -51,8 +51,17 @@ export default function SignInPage({
         return;
       }
 
+      const role = data?.user?.role;
+      const destination =
+        role === "admin"
+          ? "/dashboard/admin"
+          : role === "vendor"
+            ? "/dashboard/vendor"
+            : "/dashboard/customer";
+
       toast.success("Welcome back!");
-      router.push("/auth/callback");
+      router.replace(destination);
+      router.refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {
