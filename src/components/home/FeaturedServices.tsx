@@ -34,7 +34,7 @@ export async function FeaturedServices() {
           ))}
         </div>
         
-        {/* Empty State */}
+        
         {services.length === 0 && (
           <div className="text-center py-20 text-slate-muted">
             No services available at the moment.

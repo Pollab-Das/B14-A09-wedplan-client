@@ -75,7 +75,7 @@ export function HeroSection() {
             href="/sign-up?role=vendor"
             className="bg-transparent border border-[#d4af37]/50 text-[#d4af37] px-8 py-4 rounded-full text-lg font-semibold hover:bg-[#d4af37]/10 transition-all hover:scale-105"
           >
-            Join as Vendor
+          Join as Vendor 
           </Link>
         </motion.div>
       </div>
