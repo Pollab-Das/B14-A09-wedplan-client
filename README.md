@@ -39,9 +39,9 @@ See `.env.example`. Never commit `.env`, `.env.local`, or secret values. Require
 
 ## URLs
 
-- Live website: `REPLACE_WITH_LIVE_URL`
-- Client repository: https://github.com/Pollab-Das/B14-A09-VowVista-WeddingPlanningPlatform-client.git
-- Server repository: `REPLACE_WITH_SERVER_REPO_URL`
+- Live website: https://b14-a09-wedplan-client.vercel.app
+- Client repository: https://github.com/Pollab-Das/B14-A09-wedplan-client
+- Server repository: https://github.com/Pollab-Das/B14-A09-wedplan-server
 
 ## Deployment Guideline
 
