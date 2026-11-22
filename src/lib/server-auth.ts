@@ -3,9 +3,15 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export async function getSession() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const requestHeaders = await headers();
+  let session;
+
+  try {
+    session = await auth.api.getSession({ headers: requestHeaders });
+  } catch (error) {
+    console.error("[auth] Unable to read session:", error);
+    return null;
+  }
 
   if (session?.user?.isBlocked) {
     redirect("/sign-in?error=blocked");

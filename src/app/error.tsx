@@ -8,11 +8,11 @@ export default function Error({
   error,
   retry,
 }: {
-  error: unknown;
+  error: Error & { digest?: string };
   retry: () => void;
 }) {
   useEffect(() => {
-    console.error(error);
+    console.error("[app-error]", error.message || error, error.digest);
   }, [error]);
 
   return (
@@ -34,6 +34,9 @@ export default function Error({
           We could not load this part of your planning journey. Please try again, or head back to
           the homepage.
         </p>
+        {error.digest && (
+          <p className="text-slate-500 text-xs mb-8">Reference: {error.digest}</p>
+        )}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
             type="button"

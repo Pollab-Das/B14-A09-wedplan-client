@@ -2,9 +2,16 @@ import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { MongoClient } from "mongodb";
 
-const baseURL = process.env.BETTER_AUTH_URL || "https://b14-a09-wedplan-client.vercel.app";
+const baseURL =
+  process.env.BETTER_AUTH_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 
-const client = new MongoClient(process.env.MONGODB_URI as string);
+const mongodbUri = process.env.MONGODB_URI;
+if (!mongodbUri) {
+  throw new Error("[auth] MONGODB_URI is not set");
+}
+
+const client = new MongoClient(mongodbUri);
 const db = client.db(process.env.MONGODB_DB_NAME || "wedplan");
 
 export const auth = betterAuth({

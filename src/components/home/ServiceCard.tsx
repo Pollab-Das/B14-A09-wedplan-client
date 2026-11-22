@@ -71,7 +71,7 @@ export function ServiceCard({ service }: { service: ServiceSummary }) {
             onClick={handleViewDetails}
             className="block w-full text-center py-3 rounded-xl border border-[#d4af37]/30 text-[#d4af37] font-medium hover:bg-[#d4af37] hover:text-[#0f172a] transition-colors"
           >
-            View Details
+            View Details 
           </Link>
         </div>
       </div>
