@@ -21,7 +21,7 @@ export const auth = betterAuth({
     requireUppercase: true,
     requireLowercase: true,
   },
-  // 🔥 স্টেট ডাটাবেসে সেভ হবে (Better Auth-এর ডিফল্ট), যা ক্লায়েন্ট এবং মোবাইল উভয় ক্ষেত্রে ভালো কাজ করে
+  // স্টেট ডাটাবেসে সেভ হবে (Better Auth-এর ডিফল্ট), যা ক্লায়েন্ট এবং মোবাইল উভয় ক্ষেত্রে ভালো কাজ করে
   account: {
     storeStateStrategy: "database", 
   },
