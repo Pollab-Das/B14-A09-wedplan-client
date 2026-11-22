@@ -121,7 +121,7 @@ export function BookingForm({ service }: { service: any }) {
           </div>
         </div>
 
-        {/*মেসেজ*/}
+        {/*--->মেসেজ<----*/}
         <div className="space-y-2">
           <Label className="text-slate-300">Message to Vendor (Optional)</Label>
           <div className="relative">
