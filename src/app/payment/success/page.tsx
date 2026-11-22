@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { AlertCircle, CheckCircle, Clock3, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { fetchWithAuth } from "@/lib/api";
 
 type VerificationState = "verifying" | "premium" | "pending" | "unverified";
 
@@ -25,6 +26,7 @@ function PaymentSuccessContent() {
   const sessionId = searchParams.get("session_id") ?? searchParams.get("sessionId");
   const [state, setState] = useState<VerificationState>("verifying");
   const [attempt, setAttempt] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -38,15 +40,24 @@ function PaymentSuccessContent() {
       }
 
       try {
+        await fetchWithAuth("/payments/verify-session", {
+          method: "POST",
+          body: JSON.stringify({ sessionId, session_id: sessionId }),
+        });
+
         const response = await fetch("/api/auth/get-session?disableCookieCache=true", {
           credentials: "include",
           cache: "no-store",
         });
         const data = response.ok ? await response.json() : null;
         if (cancelled) return;
-        setState(data?.user?.subscriptionPlan === "premium" ? "premium" : "pending");
-      } catch {
-        if (!cancelled) setState("pending");
+        const premium = data?.user?.subscriptionPlan === "premium";
+        setError(premium ? null : "Payment confirmed, but premium is not active yet.");
+        setState(premium ? "premium" : "pending");
+      } catch (err) {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : "Payment verification failed.");
+        setState("pending");
       }
     };
 
@@ -104,6 +115,7 @@ function PaymentSuccessContent() {
         {display.icon}
         <h1 className="text-3xl font-heading font-bold text-[#FDFBF7] mb-4 relative z-10">{display.title}</h1>
         <p className="text-slate-400 mb-8 relative z-10">{display.message}</p>
+        {error && <p className="text-red-400 text-sm mb-6 relative z-10">{error}</p>}
         
         {(state === "pending" || state === "unverified") && (
           <Button
