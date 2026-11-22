@@ -6,7 +6,6 @@ import { useSearchParams } from "next/navigation";
 import { AlertCircle, CheckCircle, Clock3, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { fetchWithAuth } from "@/lib/api";
 
 type VerificationState = "verifying" | "premium" | "pending" | "unverified";
 
@@ -40,10 +39,17 @@ function PaymentSuccessContent() {
       }
 
       try {
-        await fetchWithAuth("/payments/verify-session", {
+        const confirmation = await fetch("/api/payments/confirm", {
           method: "POST",
-          body: JSON.stringify({ sessionId, session_id: sessionId }),
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ sessionId }),
         });
+
+        if (!confirmation.ok) {
+          const result = await confirmation.json().catch(() => ({}));
+          throw new Error(result.message || "Payment verification failed.");
+        }
 
         const response = await fetch("/api/auth/get-session?disableCookieCache=true", {
           credentials: "include",
