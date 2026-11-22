@@ -56,18 +56,36 @@ export async function POST(request: Request) {
     ];
 
     await Promise.all(
-      [...new Set(databaseNames)].map((name) =>
-        client
-          .db(name)
-          .collection("user")
-          .updateOne(filter, {
-            $set: {
-              subscriptionPlan: "premium",
-              subscriptionExpiresAt: expiresAt,
-              premiumActivatedAt: new Date(),
+      [...new Set(databaseNames)].map(async (name) => {
+        const db = client.db(name);
+
+        await db.collection("user").updateOne(filter, {
+          $set: {
+            subscriptionPlan: "premium",
+            subscriptionExpiresAt: expiresAt,
+            premiumActivatedAt: new Date(),
+          },
+        });
+
+        await db.collection("transactions").updateOne(
+          { stripeSessionId: sessionId },
+          {
+            $setOnInsert: {
+              vendorId: session.user.id,
+              plan: "premium",
+              amount: typeof paymentSession.amount_total === "number" ? paymentSession.amount_total / 100 : 0,
+              currency: String(paymentSession.currency || "usd").toUpperCase(),
+              stripeSessionId: sessionId,
+              stripeSubscriptionId: paymentSession.subscription || null,
+              stripeEventId: null,
+              status: "success",
+              createdAt: new Date(),
+              immutable: true,
             },
-          })
-      )
+          },
+          { upsert: true }
+        );
+      })
     );
 
     return Response.json({ premium: true });
